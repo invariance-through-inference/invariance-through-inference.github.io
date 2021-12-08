@@ -14,11 +14,11 @@
                 including changes in camera poses and lighting conditions.
                 Results are presented on challenging distractor control suite, a robotics environment with image-based observations.">
 
-    <meta name="keywords" content="Contrastive Learning, Deep Reinforcement Learning, Universal Value Function">
-    <meta name="author" content="Ge Yang <ge.ike.yang@gmail.com>">
-    <meta property="og:title" content="Plan2Vec: Unsupervised Representation Learning by Latent Plans">
+    <meta name="keywords" content="Deep Reinforcement Learning, Domain Adaptation, Generalization">
+    <meta name="author" content="Takuma Yoneda <takuma@ttic.edu>">
+    <meta property="og:title" content="Invariance Through Inference">
     <meta property="og:image" content="https://geyang.github.io/plan2vec/thumbnail.jpg">
-    <meta name="twitter:creator" content="@episodeyang">
+    <meta name="twitter:creator" content="@takuma_ynd">
     <meta name="twitter:card" content="summary">
     <meta property="og:description"
           content="We introduce a general approach, called Invariance Through Inference,
@@ -42,12 +42,12 @@
     <section id="frontmatter">
         <h1>Invariance Through Inference</h1>
         <h2 id="authors" style="margin-bottom: 0;">Takuma Yoneda,<sup>1</sup> Ge Yang,<sup>2</sup>
-            Matthew Walter,<sup>1</sup> Bradly Stadie,<sup>1</sup>
+            Matthew Walter,<sup>1</sup> Bradly Stadie<sup>1</sup>
         </h2>
         <h3 style="margin-top: 10px;"><sup>1</sup>TTI-Chicago, <sup>2</sup>MIT CSAIL </h3>
         <h3 id="links">
-            <a href="https://github.com/geyang/plan2vec">CODE</a
-            >|<a href="https://arxiv.org/abs/2005.03648">PAPER</a
+            <a href="https://github.com/takuma-yoneda/invariance-through-inference">CODE</a
+            >|<a href="https://example.com">PAPER</a>
         </h3>
         <h2>Overview</h2>
         <p><b>Inverse Through Inference</b> (ITI) is a self-supervised adaptation method for Reinforcement Learning agents.
@@ -75,17 +75,19 @@
         Results are presented on challenging distractor control suite, a robotics environment with image-based observations.
     </p>
 
-    <h3 id="motivation">Motivation</h3>
+    <h2 id="motivation">Motivation</h3>
     <p>
         Pixel-based RL agent is known to be brittle against distractions.
         A pretrained agent fails to work in a target distracting environment because there's a large shift in observation space.
         A typical approach to this problem is to apply <b>data augmentation</b>. This corresponds to expanding the support of the training distribution.
         <!-- SVEA, DrQ-v2 and SODA are among those methods. -->
     </p>
-
     <p>
-        However, as the target distribution becomes far from training, we need more and more augmentations, and it becomes infeasible at some point.
+        This makes the agent more robust against distractions, however, as the target distribution becomes far from training,
+        we need more and more augmentations, and it becomes infeasible at some point.
+        <img src="./media/motivation2.png" alt="motivation" class="center-narrow">
     </p>
+
     <p>
         Another approach that does not have this issue is <b>domain adaptation</b> that attempts to adapt the network to the target domain.
         In this work, we propose <b>Invariance Through Inference</b> (ITI) that performs self-supervised domain adaptation.
@@ -96,13 +98,10 @@
         The shift in observation space makes the corresponding latent space largely deviate.
         The task of ITI is to bring it back to align the latent structures, by adapting the encoder.
     </p>
-    <p>Maybe add some figure here?</p>
-
 
     <h2 id="method">Method</h2>
-    <h3 id="method-preprocess">Preprocess</h3>
     <p>
-        Given an agent pretrained in a source domain, we deploy a random policy in both source and target domain to collect transitions, and store them to the buffers.
+        Given an agent pretrained in a source domain, we first deploy a random policy in both source and target domain to collect transitions, and store them to the buffers.
         For the source buffer, we encode observations and store latent transitions \((z_t, a_t, z_{t+1})\).
         <img src="./media/preprocess1.png" alt="ITI-preprocess" class="center-wide">
     </p>
@@ -110,7 +109,6 @@
         Then, collect random trajectories in the target domain.
         <img src="./media/preprocess2.png" alt="ITI-preprocess" width="60%" class="center">
     </p>
-    <h3 id="method-adaptation">Adaptation</h3>
     <p>
         ITI adapts encoder following the two objectives: <i>distribution matching</i> and <i>dynamics consistency</i>.
         <!-- <img src="./method.png" alt="ITI" class="center"> -->
@@ -125,7 +123,7 @@
 
     </p>
 
-    <h3 id="experiments">Experiments</h3>
+    <h2 id="experiments">Experiments</h2>
     <p>
         To experiment our adaptation scheme on various type of target domains, we deployed our agents in DeepMind Control suite.
         Especially, we employed a modified version of DistractCS that provides <i>color</i>, <i>camera</i>, and <i>background distractions</i> to DeepMind Control suite.
