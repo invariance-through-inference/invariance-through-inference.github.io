@@ -17,7 +17,7 @@
     <meta name="keywords" content="Deep Reinforcement Learning, Domain Adaptation, Generalization">
     <meta name="author" content="Takuma Yoneda <takuma@ttic.edu>">
     <meta property="og:title" content="Invariance Through Inference">
-    <meta property="og:image" content="https://geyang.github.io/plan2vec/thumbnail.jpg">
+    <meta property="og:image" content="media/thumbnail.jpg">
     <meta name="twitter:creator" content="@takuma_ynd">
     <meta name="twitter:card" content="summary">
     <meta property="og:description"
@@ -50,12 +50,11 @@
             >|<a href="https://example.com">PAPER</a>
         </h3>
         <h2>Overview</h2>
-        <p><b>Inverse Through Inference</b> (ITI) is a self-supervised adaptation method for Reinforcement Learning agents.
-            ITI adapts an agent's encoder to a target domain without access to its reward.</p>
+        <p><b>Inverse Through Inference</b> (ITI) is a self-supervised adaptation method for a Reinforcement Learning agent.
+            ITI adapts the encoder of an agent to a target domain without access to reward.</p>
         <p>
             <video autoplay muted loop playsinline width="60%" height="auto" class="center-wide">
-                <source src="media/demo2.webm" type="video/webm">
-                <!-- <source src="media/method.mp4" type="video/mp4"> -->
+                <source src="media/demo-video-noanimation.webm" type="video/webm">
             </video>
         </p>
         <!-- <iframe class="video" width="100%" height="338px" src="https://www.youtube.com/embed/KtvTt3U5bME?rel=0"
@@ -77,49 +76,64 @@
 
     <h2 id="motivation">Motivation</h3>
     <p>
-        Pixel-based RL agent is known to be brittle against distractions.
-        A pretrained agent fails to work in a target distracting environment because there's a large shift in observation space.
-        A typical approach to this problem is to apply <b>data augmentation</b>. This corresponds to expanding the support of the training distribution.
+        Pixel-based RL agents are known to be brittle against distractions, due to its large shift in observation space.
+        A typical approach to this issue is to apply <b>data augmentation</b>.
+        This corresponds to expanding the support of the training distribution, as shown in the green circle below.
         <!-- SVEA, DrQ-v2 and SODA are among those methods. -->
     </p>
     <p>
-        This makes the agent more robust against distractions, however, as the target distribution becomes far from training,
-        we need more and more augmentations, and it becomes infeasible at some point.
+        Training with augmented observations makes the agent more robust against distractions,
+        however, as the target distribution (the pink circle below) goes far away from training,
+        more and more augmentations becomes necessary, which becomes infeasible at some point.
         <img src="./media/motivation2.png" alt="motivation" class="center-narrow">
     </p>
 
     <p>
-        Another approach that does not have this issue is <b>domain adaptation</b> that attempts to adapt the network to the target domain.
-        In this work, we propose <b>Invariance Through Inference</b> (ITI) that performs self-supervised domain adaptation.
-        Especially, ITI adapts a pretrained observation encoder so that the downstream policy \(\pi(a|z)\) can transfer without modification.
+        When we have some knowledge of the target (test) domain, a better approach would be <b>domain adaptation</b>
+        that adapt the agent to the target (test) domain.
+
+        In this paper, we assume the target domain is accessible except for its reward, and
+        propose <b>Invariance Through Inference</b> (ITI) that performs self-supervised domain adaptation.
+        Specifically, ITI adapts an observation encoder
+        so that the pretrained downstream policy \(\pi(a|z)\) can transfer to the target domain without modification.
 
         <!-- <img src="./motivation.png" alt="ITI-motivation" class="center"> -->
 
-        The shift in observation space makes the corresponding latent space largely deviate.
-        The task of ITI is to bring it back to align the latent structures, by adapting the encoder.
+        <!-- The shift in observation space makes the corresponding latent space largely deviate.
+             The task of ITI is to bring it back to align the latent structures, by adapting the encoder. -->
+    </p>
+    <p>
+        We consider that it is <u>the large distribution shift in the latent space</u> that causes a poor performance in the target domain.
+        Our approach attempts to <i>undo</i> this shift, by adapting the encoder based on two objectives: (1) <i>distribution matching</i> and (2) <i>dynamics consistency</i>.
     </p>
 
     <h2 id="method">Method</h2>
     <p>
-        Given an agent pretrained in a source domain, we first deploy a random policy in both source and target domain to collect transitions, and store them to the buffers.
-        For the source buffer, we encode observations and store latent transitions \((z_t, a_t, z_{t+1})\).
+        Given an agent pretrained in a source domain, a random policy collects transitions in the source domain.
+        The observations are encoded with pretrained encoder, and the resulting <i>latent</i> transitions \((z_t, a_t, z_{t+1})\) are stored into source buffer.
+        <!-- It should be noted that we encode observations and store <i>latent</i> transitions . -->
         <img src="./media/preprocess1.png" alt="ITI-preprocess" class="center-wide">
+        Succeedingly, we pretrain dynamics networks \(C_\text{dyn}\) using samples from the buffer.
+        \(C_\text{dyn}\) consists of forward dynamics network \(\hat{z}_{t+1} = C_\text{fwd}(z_t, a_t)\)
+        and inverse dynamics network \(\hat{a}_t = C_\text{inv}(z_t, z_{t+1})\).
+        We can think of this step as implicitly encoding the latent transition structure (somewhat like MDP) of the source domain into the weights of these networks.
     </p>
     <p>
-        Then, collect random trajectories in the target domain.
+        We also collect random transitions in the target domain. But this time we store transitions with raw observations \((o_t, a_t, o_{t+1})\).
         <img src="./media/preprocess2.png" alt="ITI-preprocess" width="60%" class="center">
     </p>
     <p>
-        ITI adapts encoder following the two objectives: <i>distribution matching</i> and <i>dynamics consistency</i>.
+        Once the preprocessing steps described above are completed, the main adaptation step begins.
+        We use sample transitions from source and target buffer, and train encoder \(F\) (intialized to the pretrained weights) and discriminator \(D\) (initialized randomly).
+
+
+        <!-- ITI adapts encoder following the two objectives: <i>distribution matching</i> and <i>dynamics consistency</i>. -->
         <!-- <img src="./method.png" alt="ITI" class="center"> -->
         <video autoplay muted loop playsinline class="center" poster="media/method.png">
             <source src="media/method.webm" type="video/webm">
             <!-- <source src="media/method.mp4" type="video/mp4"> -->
         </video>
-        <small>You can download the static figure <a href="https://example.com">here</a></small>
-
-        Distribution matching is achieved via adversarial training,
-        and dynamics consistency consists of pretrained forward and backward dynamics network.
+        <small>* You can download the static version <a href="https://example.com">here</a></small>
 
     </p>
 
