@@ -14,7 +14,7 @@
                 including changes in camera poses and lighting conditions.
                 Results are presented on challenging distractor control suite, a robotics environment with image-based observations.">
 
-    <meta name="keywords" content="Deep Reinforcement Learning, Domain Adaptation, Generalization">
+    <meta name="keywords" content="Deep Reinforcement Learning, Deep Learning, Domain Adaptation, Generalization">
     <meta name="author" content="Takuma Yoneda <takuma@ttic.edu>">
     <meta property="og:title" content="Invariance Through Inference">
     <meta property="og:image" content="media/thumbnail.jpg">
@@ -159,6 +159,32 @@
         Here is the domain-wise breakdown of background distraction with intensity \(1.0\).
         <img src="./media/main-table.png" alt="main-table" class="center-wide">
     </p>
+
+    <h2 id="sim-to-real">Sim-to-real</h2>
+    <p>
+        We trained a SVEA agent on reach task in a simulated Fetch robot, and deployed the policy on UR5 in the real world.
+    </p>
+
+    <p>
+        <img src="./media/sim-to-real.png" alt="main-result" class="center">
+    </p>
+
+    <p>
+        Zero-shot policy kept producing the same action regardless of the observation, however, the policy
+        adapted with our method reaches the goal reasonably well. <br/>
+        We emphasize that our adaptation only requires unpaired trajectories in both domains (simulation and real). <br/>
+        And it does not need access to reward in the target (real) environment.
+    </p>
+
+    <p>
+        <iframe class="center" width="560" height="315" src="https://www.youtube.com/embed/QSCbTsormgo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </p>
+    <p>
+        <small>* The video is played in 20x speed.</small>
+    </p>
+
+
+
 
     <h2>BibTex</h2>
     <pre>@misc{yoneda2021invariance,
