@@ -162,7 +162,7 @@
 
     <h2 id="sim-to-real">Sim-to-real</h2>
     <p>
-        We trained a SVEA agent on reach task in a simulated Fetch robot, and deployed the policy on UR5 in the real world.
+        We trained a SVEA agent on a reach task with a simulated Fetch robot, and then deployed the policy on a UR5 robot in the real world.
     </p>
 
     <p>
@@ -170,10 +170,8 @@
     </p>
 
     <p>
-        Zero-shot policy kept producing the same action regardless of the observation, however, the policy
-        adapted with our method reaches the goal reasonably well. <br/>
-        We emphasize that our adaptation only requires unpaired trajectories in both domains (simulation and real). <br/>
-        And it does not need access to reward in the target (real) environment.
+        We find that the zero-shot policy keeps producing the same action regardless of the given observation. In contrast, the policy adapted with ITI shows the ability to consistently reach the goal state.
+        Crucially, our adaptation only requires unpaired trajectories in both domains (simulation and real). What’s more, it does not need access to reward in the target (real) environment.
     </p>
 
     <p>
